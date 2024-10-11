@@ -1,0 +1,57 @@
+# Importing necessary libraries
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+# Sample dataset: 10-15 webtoon descriptions with categories
+data = {
+    'description': [
+        'A love story between a high school girl and a popular guy.',
+        'A world where magic and knights fight evil forces.',
+        'A young woman faces heartbreak but finds new love.',
+        'A hero saves the world from an alien invasion.',
+        'Two best friends go on an adventure to find treasure.',
+        'A shy girl discovers her hidden powers in a fantasy land.',
+        'A detective solves a series of mysterious murders.',
+        'A thrilling story of a man seeking revenge.',
+        'A futuristic world where robots and humans coexist.',
+        'An epic journey of a warrior fighting dragons.'
+    ],
+    'category': [
+        'Romance', 'Fantasy', 'Romance', 'Action', 'Action', 'Fantasy', 
+        'Action', 'Action', 'Fantasy', 'Fantasy'
+    ]
+}
+
+# Converting dataset to DataFrame
+df = pd.DataFrame(data)
+
+# Preprocessing: Convert text to TF-IDF features
+vectorizer = TfidfVectorizer(stop_words='english')
+X = vectorizer.fit_transform(df['description'])
+y = df['category']
+
+# Splitting the dataset into training and testing sets (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model: Decision Tree Classifier
+clf = DecisionTreeClassifier()
+clf.fit(X_train, y_train)
+
+# Predicting on the test set
+y_pred = clf.predict(X_test)
+
+# Output the accuracy and classification report
+print(f'Accuracy: {accuracy_score(y_test, y_pred):.2f}')
+print('Classification Report:')
+print(classification_report(y_test, y_pred))
+
+# Test with a new webtoon description
+new_description = ['A young warrior fights for justice in a corrupt kingdom.']
+new_description_tfidf = vectorizer.transform(new_description)
+prediction = clf.predict(new_description_tfidf)
+
+print(f'Predicted category for new description: {prediction[0]}')
